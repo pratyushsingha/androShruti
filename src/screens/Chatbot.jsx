@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Toast from "react-native-toast-message";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -7,11 +8,13 @@ import {
 import {
   Text,
   View,
-  Image,
   ScrollView,
   TextInput,
   TouchableOpacity,
   FlatList,
+  SafeAreaView,
+  KeyboardAvoidingView,
+  ActivityIndicator,
 } from "react-native";
 import axios from "axios";
 
@@ -31,7 +34,7 @@ export default function Chatbot() {
     const headers = {
       "Content-Type": "application/json",
       Authorization:
-        "Bearer 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",
+        "Bearer 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",
     };
 
     const newInput = input;
@@ -53,10 +56,18 @@ export default function Chatbot() {
           { role: "assistant", content },
         ]);
       } else {
-        console.log("no content found");
+        Toast.show({
+          type: "error",
+          text1: "Sorry😢",
+          text2: "No content found",
+        });
       }
     } catch (error) {
-      console.error("Error:", error);
+      Toast.show({
+        type: "error",
+        text1: "We are sorry",
+        text2: `${error}`,
+      });
     }
     setLoading(false);
   };
@@ -66,53 +77,73 @@ export default function Chatbot() {
     if (input.trim() !== "") {
       chatResponse();
     } else {
-      console.log("input can't be empty");
+      Toast.show({
+        type: "error",
+        text1: "Write something😢✒️",
+        text2: "Input can't be empty",
+      });
     }
   };
 
   return (
-    <View className="mx-2 my-2">
-      <View style={{ height: hp(85) }} className="bg-neutral-200">
-        <ScrollView
-          bounce={false}
-          showsVerticalScrollIndicator={false}
-          className="space-y-2 px-1 py-1"
-        >
-          <FlatList
-            data={conversation}
-            renderItem={({ item }) => (
-              <View
-                className={`${
-                  item.role === "user"
-                    ? "flex justify-start"
-                    : "flex justify-end"
-                }`}
-              >
+    <SafeAreaView className="mx-2 my-2">
+      <KeyboardAvoidingView keyboardVerticalOffset={hp(5)} behavior="padding">
+        <View style={{ height: hp(84) }} className="bg-neutral-200">
+          <ScrollView
+            bounce={false}
+            showsVerticalScrollIndicator={false}
+            className="space-y-2 px-1 py-1"
+          >
+            <FlatList
+              data={conversation}
+              renderItem={({ item }) => (
                 <View
-                  className="px-1 py-1"
+                  className={`${
+                    item.role === "user"
+                      ? "flex justify-start"
+                      : "flex justify-end"
+                  }`}
                 >
-                  <Text className={`block text-justify text-md ${item.role==="user"?`text-red-500 font-bold bg-black px-2 py-2 rounded-xl`:`text-green-500 bg-black px-2 py-2 rounded-xl`}`}>{item.content}</Text>
+                  <View className="px-1 py-1">
+                    <Text
+                      className={`block text-justify text-md ${
+                        item.role === "user"
+                          ? `text-red-500 font-bold bg-black px-2 py-2 rounded-xl`
+                          : `text-green-500 bg-black px-2 py-2 rounded-xl`
+                      }`}
+                    >
+                      {item.content}
+                    </Text>
+                  </View>
                 </View>
-              </View>
-            )}
-          />
-        </ScrollView>
-      </View>
+              )}
+            />
+          </ScrollView>
+          <Toast />
+        </View>
 
-      <View className="flex-row space-x-2">
-        <TextInput
-          placeholder="Message"
-          style={{ width: wp(80) }}
-          onChangeText={changeHandler}
-          value={input}
-        />
-        <TouchableOpacity
-          className="bg-blue-500 rounded-xl px-3 py-4"
-          onPress={submitHandler}
-        >
-          <Text className="text-white">Send</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+        <View className="flex-row space-x-2 mt-1">
+          <TextInput
+            className="border rounded-3xl px-3 text-lg"
+            placeholder="Message"
+            style={{ width: wp(80) }}
+            onChangeText={changeHandler}
+            value={input}
+          />
+          <TouchableOpacity
+            className="bg-blue-500 rounded-lg"
+            onPress={submitHandler}
+          >
+            <Text className="text-white px-3 py-3">
+              {loading ? (
+                <ActivityIndicator size="small" color="#FFFFFF" />
+              ) : (
+                "send"
+              )}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

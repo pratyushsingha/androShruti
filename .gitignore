@@ -35,4 +35,6 @@ yarn-error.*
 *.tsbuildinfo
 
 # credentials
-FirebaseConfig.js
+# FirebaseConfig.js
+
+# %ProgramData%/
