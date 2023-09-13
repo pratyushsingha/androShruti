@@ -1,9 +1,9 @@
-
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Home from "./src/screens/Home";
 import Login from './src/screens/Login';
+import Chatbot from './src/screens/Chatbot';
+import Welcome from './src/screens/Welcome';
 
 
 function App() {
@@ -14,7 +14,10 @@ function App() {
         <Stack.Screen name='Login' component={Login} options={{
           headerShown: false,
         }} />
-        <Stack.Screen name="Home" component={Home} options={{
+        <Stack.Screen name='Welcome' component={Welcome} options={{
+          headerShown: false,
+        }} />
+        <Stack.Screen name="Chatbot" component={Chatbot} options={{
           headerShown: false,
         }} />
       </Stack.Navigator>

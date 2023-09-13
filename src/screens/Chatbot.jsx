@@ -1,12 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Toast from "react-native-toast-message";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
 
+import Navbar from "./Navbar";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
   Text,
+  Image,
   View,
   ScrollView,
   TextInput,
@@ -17,8 +16,15 @@ import {
   ActivityIndicator,
 } from "react-native";
 import axios from "axios";
+import {
+  responsiveHeight,
+  responsiveWidth,
+} from "react-native-responsive-dimensions";
 
-export default function Chatbot() {
+export default function Chatbot({ route, navigation }) {
+  const { userName } = route.params;
+  const scrollViewRef = useRef();
+
   const [input, setInput] = useState("");
   const [conversation, setConversation] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -34,7 +40,7 @@ export default function Chatbot() {
     const headers = {
       "Content-Type": "application/json",
       Authorization:
-        "Bearer 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",
+        "Bearer ",
     };
 
     const newInput = input;
@@ -86,47 +92,87 @@ export default function Chatbot() {
   };
 
   return (
-    <SafeAreaView className="mx-2 my-2">
-      <KeyboardAvoidingView keyboardVerticalOffset={hp(5)} behavior="padding">
-        <View style={{ height: hp(84) }} className="bg-neutral-200">
-          <ScrollView
-            bounce={false}
-            showsVerticalScrollIndicator={false}
-            className="space-y-2 px-1 py-1"
-          >
-            <FlatList
-              data={conversation}
-              renderItem={({ item }) => (
-                <View
-                  className={`${
-                    item.role === "user"
-                      ? "flex justify-start"
-                      : "flex justify-end"
-                  }`}
-                >
-                  <View className="px-1 py-1">
-                    <Text
-                      className={`block text-justify text-md ${
-                        item.role === "user"
-                          ? `text-red-500 font-bold bg-black px-2 py-2 rounded-xl`
-                          : `text-green-500 bg-black px-2 py-2 rounded-xl`
-                      }`}
-                    >
+    <SafeAreaView
+      style={{
+        marginLeft: responsiveWidth(1),
+        marginRight: responsiveWidth(1),
+      }}
+      className="dark:bg-gray-800 bg-white"
+    >
+      <Navbar />
+      <View style={{ height: responsiveHeight(98) }} className="">
+        <ScrollView
+          bounce={false}
+          ref={scrollViewRef}
+          onContentSizeChange={() =>
+            scrollViewRef.current.scrollToEnd({ animated: true })
+          }
+          showsVerticalScrollIndicator={false}
+          className="space-y-2 px-1 py-1"
+        >
+          <FlatList
+            data={conversation}
+            renderItem={({ item }) => (
+              <View>
+                <View className="px-1 py-1">
+                  <View
+                    className={`block text-justify text-md flex-col space-y-1  ${
+                      item.role === "user"
+                        ? `  px-2 py-2 rounded-xl flex`
+                        : `px-2 py-2 rounded-xl`
+                    }`}
+                  >
+                    <Text className="text-gray-700">
+                      {item.role === "user" ? (
+                        <View className="flex flex-row space-x-1">
+                          <Image
+                            className="w-5 h-5 rounded-full self-center"
+                            source={{
+                              uri: "https://www.pngarts.com/files/10/Default-Profile-Picture-PNG-Free-Download.png",
+                            }}
+                          />
+                          <Text className="text-red-600 font-bold">
+                            {userName}
+                          </Text>
+                        </View>
+                      ) : (
+                        <View className="flex flex-row space-x-1">
+                          <Image
+                            className="w-4 h-4 rounded-full self-center"
+                            source={{
+                              uri: "https://i.postimg.cc/vBd2MN55/5cb480cd5f1b6d3fbadece79.png",
+                            }}
+                          />
+                          <Text className="text-green-600 font-bold">
+                            SHRUTI
+                          </Text>
+                        </View>
+                      )}
+                    </Text>
+                    <Text className="text-gray-700 font-semibold text-justify">
                       {item.content}
                     </Text>
                   </View>
                 </View>
-              )}
-            />
-          </ScrollView>
-          <Toast />
-        </View>
-
-        <View className="flex-row space-x-2 mt-1">
+              </View>
+            )}
+          />
+        </ScrollView>
+        <Toast />
+      </View>
+      <KeyboardAvoidingView
+        keyboardVerticalOffset={12}
+        behavior={"position"}
+      >
+        <View className=" bg-white flex-row space-x-2 mt-1 justify-center items-center">
+          {loading && <ActivityIndicator size="small" color="#052c70" />}
           <TextInput
-            className="border rounded-3xl px-3 text-lg"
+            className="border rounded-3xl px-3 text-lg bg-slate-200 dark:bg-gray-500"
             placeholder="Message"
-            style={{ width: wp(80) }}
+            style={{
+              width: loading ? responsiveWidth(76) : responsiveWidth(84),
+              height: responsiveHeight(5.3),
+            }}
             onChangeText={changeHandler}
             value={input}
           />
@@ -136,9 +182,9 @@ export default function Chatbot() {
           >
             <Text className="text-white px-3 py-3">
               {loading ? (
-                <ActivityIndicator size="small" color="#FFFFFF" />
+                <FontAwesome name="square" />
               ) : (
-                "send"
+                <FontAwesome name="arrow-up" />
               )}
             </Text>
           </TouchableOpacity>

@@ -8,12 +8,12 @@ import {
   View,
   Text,
   SafeAreaView,
-  TouchableOpacity,
-  ScrollView,
   ActivityIndicator,
   Button,
   TextInput,
+  Alert,
 } from "react-native";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { FIREBASE_AUTH } from "../../FirebaseConfig";
 import {
   signInWithEmailAndPassword,
@@ -32,7 +32,12 @@ export default function Login({ navigation }) {
     try {
       const response = await signInWithEmailAndPassword(auth, email, password);
       console.log(response);
-      navigation.navigate("Home");
+      Toast.show({
+        type: "success",
+        text1: `Welcome ${email.split("@")[0].toUpperCase()}`,
+        text2: `successfully loged in`,
+      });
+      navigation.navigate("Welcome", { email: `${email}` });
     } catch (err) {
       console.log(err);
       Toast.show({
@@ -44,6 +49,7 @@ export default function Login({ navigation }) {
       setLoading(false);
     }
   };
+  
   const signUp = async () => {
     setLoading(true);
     try {
@@ -53,6 +59,11 @@ export default function Login({ navigation }) {
         password
       );
       console.log(response);
+      Toast.show({
+        type: "success",
+        text1: `Hiii ${email.split("@")[0].toUpperCase()}`,
+        text2: `Login to continue👋`,
+      });
     } catch (err) {
       console.log(err);
       Toast.show({
@@ -74,7 +85,9 @@ export default function Login({ navigation }) {
 
   return (
     <SafeAreaView className="flex-1 justify-center items-center">
-      <Text className="text-2xl text-bold text-black my-6">{signup ? "SIGN IN" : "SIGN UP"}</Text>
+      <Text className="text-2xl text-bold text-black my-6">
+        {signup ? "SIGN IN" : "SIGN UP"}
+      </Text>
       <View style={{ width: wp(70) }}>
         <TextInput
           className="border-b border-black mb-2 px-2 text-lg "
@@ -100,7 +113,6 @@ export default function Login({ navigation }) {
       ) : (
         <View className="flex-col space-y-2">
           <Button
-            className="w-64"
             color="black"
             title={signup ? "login" : "sign up"}
             onPress={signup ? logIn : signUp}
